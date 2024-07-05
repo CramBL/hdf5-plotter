@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  CARGO_TERM_COLOR: always
+  JUST_VERBOSE: 1
+  #RUSTFLAGS: "--deny warnings" # Fail on all warnings
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  Test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: Swatinem/rust-cache@v2
+    - uses: extractions/setup-just@v2
+
+    - name: Setup deps
+      run: |
+        sudo apt-get update
+        sudo apt-get install musl-tools && musl-gcc --version
+        sudo apt install libhdf5-dev
+
+    - name: Build
+      run: just build-static-x86-musl
+
+    - name: Try Build again if failed
+      if: ${{ failure() }}
+      run: just build-static-x86-musl
+    
