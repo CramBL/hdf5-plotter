@@ -8,8 +8,8 @@ name = "rsplotter"
 path = "src/main.rs"
 
 [dependencies]
-hdf5 = { git = "https://github.com/CramBL/hdf5-rust", rev = "1b53164290abc4250abd59b98e8fa78901078632" }
-hdf5-sys = { git = "https://github.com/CramBL/hdf5-rust", rev = "1b53164290abc4250abd59b98e8fa78901078632", features = [
+hdf5 = { git = "https://github.com/aldanor/hdf5-rust", rev = "43015ddaa87e62b63dc1b1ae7fed49a430e1b53a" }
+hdf5-sys = { git = "https://github.com/aldanor/hdf5-rust", rev = "43015ddaa87e62b63dc1b1ae7fed49a430e1b53a", features = [
     "static",
 ] }
 
