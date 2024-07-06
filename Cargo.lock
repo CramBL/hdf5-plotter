@@ -487,7 +487,7 @@ checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
 [[package]]
 name = "hdf5"
 version = "0.8.1"
-source = "git+https://github.com/aldanor/hdf5-rust?rev=43015ddaa87e62b63dc1b1ae7fed49a430e1b53a#43015ddaa87e62b63dc1b1ae7fed49a430e1b53a"
+source = "git+https://github.com/CramBL/hdf5-rust?rev=1b53164290abc4250abd59b98e8fa78901078632#1b53164290abc4250abd59b98e8fa78901078632"
 dependencies = [
  "bitflags 2.6.0",
  "cfg-if",
@@ -504,7 +504,7 @@ dependencies = [
 [[package]]
 name = "hdf5-derive"
 version = "0.8.1"
-source = "git+https://github.com/aldanor/hdf5-rust?rev=43015ddaa87e62b63dc1b1ae7fed49a430e1b53a#43015ddaa87e62b63dc1b1ae7fed49a430e1b53a"
+source = "git+https://github.com/CramBL/hdf5-rust?rev=1b53164290abc4250abd59b98e8fa78901078632#1b53164290abc4250abd59b98e8fa78901078632"
 dependencies = [
  "proc-macro-error",
  "proc-macro2",
@@ -515,7 +515,7 @@ dependencies = [
 [[package]]
 name = "hdf5-src"
 version = "0.8.1"
-source = "git+https://github.com/aldanor/hdf5-rust?rev=43015ddaa87e62b63dc1b1ae7fed49a430e1b53a#43015ddaa87e62b63dc1b1ae7fed49a430e1b53a"
+source = "git+https://github.com/CramBL/hdf5-rust?rev=1b53164290abc4250abd59b98e8fa78901078632#1b53164290abc4250abd59b98e8fa78901078632"
 dependencies = [
  "cmake",
 ]
@@ -523,7 +523,7 @@ dependencies = [
 [[package]]
 name = "hdf5-sys"
 version = "0.8.1"
-source = "git+https://github.com/aldanor/hdf5-rust?rev=43015ddaa87e62b63dc1b1ae7fed49a430e1b53a#43015ddaa87e62b63dc1b1ae7fed49a430e1b53a"
+source = "git+https://github.com/CramBL/hdf5-rust?rev=1b53164290abc4250abd59b98e8fa78901078632#1b53164290abc4250abd59b98e8fa78901078632"
 dependencies = [
  "hdf5-src",
  "libc",
@@ -538,7 +538,7 @@ dependencies = [
 [[package]]
 name = "hdf5-types"
 version = "0.8.1"
-source = "git+https://github.com/aldanor/hdf5-rust?rev=43015ddaa87e62b63dc1b1ae7fed49a430e1b53a#43015ddaa87e62b63dc1b1ae7fed49a430e1b53a"
+source = "git+https://github.com/CramBL/hdf5-rust?rev=1b53164290abc4250abd59b98e8fa78901078632#1b53164290abc4250abd59b98e8fa78901078632"
 dependencies = [
  "ascii",
  "cfg-if",
