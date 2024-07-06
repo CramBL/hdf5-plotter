@@ -1,0 +1,39 @@
+name: armv7 build
+
+on:
+    push:
+        branches: [ "master" ]
+    pull_request:
+        branches: [ "master" ]
+
+
+jobs:
+  armv7:
+    # The host should always be Linux
+    runs-on: ubuntu-latest
+    name: Build on ubuntu-latest armv7
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: uraimo/run-on-arch-action@v2
+        name: Run commands
+        id: runcmd
+        with:
+          arch: armv7
+          distro: ubuntu_latest
+
+          install: |
+            apt-get update -q -y
+            apt-get install -q -y git cmake curl
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          run: |
+            echo ::set-output name=uname::$(uname -a)
+            cargo build --release || echo "Failed regular build"
+            echo "Now building static"
+            RUSTFLAGS="--codegen target-feature=+crt-static" cargo build --release
+
+
+
+      - name: Get the output
+        # Echo the `uname` output parameter from the `runcmd` step
+        run: |
+          echo "The uname output was ${{ steps.runcmd.outputs.uname }}"
