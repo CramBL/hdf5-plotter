@@ -84,10 +84,10 @@ jobs:
       run: rustup target add aarch64-pc-windows-msvc
 
     - name: Build
+      continue-on-error: true
       run: RUSTFLAGS="--codegen target-feature=+crt-static ${{ matrix.target_rustflags }}" cargo build --bin rsplotter --target ${{ matrix.target }} --release
     
     - name: Try Build again if failed
-      if: ${{ failure() }}
       run: RUSTFLAGS="--codegen target-feature=+crt-static ${{ matrix.target_rustflags }}" cargo build --bin rsplotter --target ${{ matrix.target }} --release
 
     
