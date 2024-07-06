@@ -27,6 +27,8 @@ jobs:
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           run: |
             echo ::set-output name=uname::$(uname -a)
+            . "$HOME/.cargo/env"
+            cargo --version
             cargo build --release || echo "Failed regular build"
             echo "Now building static"
             RUSTFLAGS="--codegen target-feature=+crt-static" cargo build --release
