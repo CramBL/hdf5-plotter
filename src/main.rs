@@ -1,10 +1,8 @@
-use hdf5::types::dyn_value::DynArray;
-use hdf5::Result;
-use hdf5::{File, H5Type};
 use ndarray;
 
 use std::error::Error;
 use std::fs;
+
 fn print_dataset_info(dataset: &hdf5::Dataset) -> Result<(), Box<dyn Error>> {
     println!("  - Dataset: {}", dataset.name());
     let dtype = dataset.dtype()?;
@@ -53,11 +51,13 @@ fn print_group_info(group: &hdf5::Group) -> Result<(), Box<dyn Error>> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    hdf5_test::swmr::multiple_reader().unwrap();
+
     // Path to your HDF5 file
     let file_path = "20240703_140137_bifrost.h5";
 
     // Open the HDF5 file
-    let file = File::open(file_path)?;
+    let file = hdf5::File::open(file_path)?;
     println!("opened");
 
     // Assume the dataset is named "dataset"
@@ -69,7 +69,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // // Read the dataset as Vec<i32> or Vec<f64> depending on the content type
     let data = dataset.read_2d::<f32>().unwrap();
 
-    let dxxx = data.fold_axis(ndarray::Axis(1), 0_f32, |c, d| *d);
+    let dxxx = data.fold_axis(ndarray::Axis(1), 0_f32, |_c, d| *d);
 
     println!("---------");
     println!("{dxxx}");
@@ -106,7 +106,6 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 #[cfg(feature = "rplotly")]
 fn plotly(data: &[f32]) {
-    use plotly::common::Title;
     use plotly::layout::{Axis, Layout};
     use plotly::Plot;
     use plotly::Scatter;
