@@ -91,3 +91,21 @@ jobs:
       run: RUSTFLAGS="--codegen target-feature=+crt-static ${{ matrix.target_rustflags }}" cargo build --bin plot5h --target ${{ matrix.target }} --release
 
 
+    - name: Upload bin Unix
+      if: ${{ !contains(matrix.os, 'windows') }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.target }}
+        path: target/${{ matrix.target }}/release/plot5h
+        retention-days: 30
+        if-no-files-found: error
+
+    - name: Upload bin Windows
+      if: ${{ !contains(matrix.os, 'windows') }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.target }}
+        path: target/${{ matrix.target }}/release/plot5h.exe
+        retention-days: 30
+        if-no-files-found: error
+        
