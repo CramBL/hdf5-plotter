@@ -1,8 +1,7 @@
 use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 use std::io::Write;
 use crate::{
-    config::{Config, InspectArgs},
-    my_hdf5::util::print_group_info, util::{print_color, print_colored_quoted},
+    config::{Config, InspectArgs}, my_hdf5::inspect::print_group_info, util::print_colored_quoted
 };
 
 pub fn handle_inspect(args: &InspectArgs, cfg: &Config) -> anyhow::Result<()> {

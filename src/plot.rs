@@ -15,7 +15,7 @@ use serde::Serialize;
 
 use crate::{
     config::{Config, PlotArgs},
-    my_hdf5::util::{print_group_info, NativePrimitiveType},
+    my_hdf5::util::NativePrimitiveType,
 };
 
 pub fn handle_plot_cmd(plot_args: &PlotArgs, cfg: &Config) -> anyhow::Result<()> {
