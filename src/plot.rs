@@ -119,7 +119,7 @@ where
     let variance = sampled_data.iter().fold(T::zero(), |acc, &x| acc + (x - avg) * (x - avg)) / T::from_usize(len).unwrap();
     let std_dev = variance.sqrt();
 
-    log::info!("Length={len}, Sum={sum}, Avg={avg}, Min={min}, Max={max}, σ={std_dev}, σ²={variance}");
+    log::info!("Length={len}, Sum={sum:.4}, Avg={avg:.4}, Min={min:.4}, Max={max:.4}, σ={std_dev:.4}, σ²={variance:.4}");
 
     plot(sampled_data)?;
     Ok(())
@@ -146,7 +146,7 @@ where
     }) / T::from_usize(len).unwrap();
     let std_dev = variance.to_f64().unwrap().sqrt();
 
-    log::info!("Length={len}, Sum={sum}, Avg={avg}, Min={min}, Max={max}, σ={std_dev}, σ²={variance}");
+    log::info!("Length={len}, Sum={sum:.4}, Avg={avg:.4}, Min={min:.4}, Max={max:.4}, σ={std_dev:.4}, σ²={variance:.4}");
 
     plot(sampled_data)?;
     Ok(())
