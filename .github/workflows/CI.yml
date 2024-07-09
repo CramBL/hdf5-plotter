@@ -85,10 +85,10 @@ jobs:
 
     - name: Build
       continue-on-error: true
-      run: RUSTFLAGS="--codegen target-feature=+crt-static ${{ matrix.target_rustflags }}" cargo build --bin plot5h --target ${{ matrix.target }} --release
+      run: RUSTFLAGS="--codegen target-feature=+crt-static ${{ matrix.target_rustflags }}" cargo build --bin ploth5 --target ${{ matrix.target }} --release
     
     - name: Try Build again if failed
-      run: RUSTFLAGS="--codegen target-feature=+crt-static ${{ matrix.target_rustflags }}" cargo build --bin plot5h --target ${{ matrix.target }} --release
+      run: RUSTFLAGS="--codegen target-feature=+crt-static ${{ matrix.target_rustflags }}" cargo build --bin ploth5 --target ${{ matrix.target }} --release
 
 
     - name: Upload bin Unix
@@ -96,7 +96,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.target }}
-        path: target/${{ matrix.target }}/release/plot5h
+        path: target/${{ matrix.target }}/release/ploth5
         retention-days: 30
         if-no-files-found: error
 
@@ -105,7 +105,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.target }}
-        path: target/${{ matrix.target }}/release/plot5h.exe
+        path: target/${{ matrix.target }}/release/ploth5.exe
         retention-days: 30
         if-no-files-found: error
         
