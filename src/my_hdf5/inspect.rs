@@ -6,12 +6,6 @@ use termcolor::{Color, StandardStream};
 
 use crate::my_hdf5::util::NativePrimitiveType;
 use crate::util::{print_color, print_colored_quoted};
-use hdf5::{ Datatype};
-
-use ndarray::{s,  IntoNdProducer, Slice};
-use ndarray::{IxDyn, SliceInfo, SliceInfoElem};
-use std::mem::size_of;
-use std::ops::Index;
 
 
 pub fn print_dataset_info(dataset: &hdf5::Dataset, n_samples: usize, out: &mut StandardStream) -> anyhow::Result<()> {

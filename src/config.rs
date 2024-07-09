@@ -1,11 +1,9 @@
 use {
     clap::{
-        builder::styling::{AnsiColor, Effects, Styles},
-        command, ArgAction, Args, Parser, Subcommand, ValueEnum,
+        command, ArgAction, Args, Parser, Subcommand,
     },
-    std::{fmt, path::PathBuf},
+    std::path::PathBuf,
     stderrlog::LogLevelNum,
-    strum_macros::{Display, EnumIter},
 };
 
 pub mod misc;
@@ -109,8 +107,13 @@ pub struct PlotArgs {
     #[arg(short, long)]
     pub dataset_name: String,
 
-    #[arg(short, long)]
-    pub axis: usize
+    #[arg(short, long, default_value("0"))]
+    pub axis: usize,
+
+    /// Include every N'th sample in the plot
+    #[arg(short, long, default_value("1"), value_name("N"))]
+    pub subsample: usize,
+
 }
 
 #[derive(Debug, Args, Clone)]

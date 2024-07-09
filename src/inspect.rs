@@ -1,5 +1,4 @@
-use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
-use std::io::Write;
+use termcolor::{Color, StandardStream};
 use crate::{
     config::{Config, InspectArgs}, my_hdf5::inspect::print_group_info, util::print_colored_quoted
 };
