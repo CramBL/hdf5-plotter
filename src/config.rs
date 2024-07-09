@@ -107,7 +107,10 @@ pub struct PlotArgs {
     pub src_hdf5: PathBuf,
 
     #[arg(short, long)]
-    pub dataset_name: Option<String>,
+    pub dataset_name: String,
+
+    #[arg(short, long)]
+    pub axis: usize
 }
 
 #[derive(Debug, Args, Clone)]
