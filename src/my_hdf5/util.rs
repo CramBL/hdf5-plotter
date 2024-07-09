@@ -1,15 +1,21 @@
-use hdf5::Datatype;
-use ndarray::{Axis, IntoNdProducer};
-use std::mem::size_of;
+use hdf5::{Dataset, Datatype, H5Type};
 
-pub fn print_dataset_info(dataset: &hdf5::Dataset) -> anyhow::Result<()> {
-    log::info!("  - Dataset: {}", dataset.name());
-    log::info!("     - Layout: {:?}", dataset.layout());
-    log::info!(
-        "     - Attribute names: {:?}",
-        dataset.attr_names().unwrap_or_default()
-    );
-    log::debug!("     - Resizable: {}", dataset.is_resizable());
+use ndarray::{s, ArrayD, Axis, IntoNdProducer, NdProducer, Slice};
+use ndarray::{IxDyn, SliceInfo, SliceInfoElem};
+use termcolor::{Color, StandardStream};
+use std::fmt;
+use std::mem::size_of;
+use std::ops::Index;
+
+use crate::my_hdf5::inspect::print_preview_n_samples;
+use crate::util::{print_color, print_colored_quoted};
+
+pub fn print_dataset_info(dataset: &hdf5::Dataset, n_samples: usize, out: &mut StandardStream) -> anyhow::Result<()> {
+
+    print_colored_quoted(out, Color::Magenta, "  - Dataset: ", format!("{}", dataset.name()))?;
+    print_colored_quoted(out, Color::Yellow, "     - Layout: ", format!("{:?}", dataset.layout()))?;
+    print_colored_quoted(out, Color::Yellow, "     - Attribute names: ", format!("{:?}", dataset.attr_names().unwrap_or_default()))?;
+    print_colored_quoted(out, Color::Yellow, "     - Resizable: ", format!("{}", dataset.is_resizable()))?;
     if let Ok(dataset_access) = dataset.access_plist() {
         log::debug!("Dataset access: ");
         if let Ok(proplistclass) = dataset_access.class() {
@@ -20,88 +26,63 @@ pub fn print_dataset_info(dataset: &hdf5::Dataset) -> anyhow::Result<()> {
     }
     let dtype = dataset.dtype()?;
     let shape = dataset.shape();
-    log::trace!("    - Data type: {dtype:?}, {}B", dtype.size());
-
-    log::info!(
-        "    - Data type: {}",
-        NativePrimitiveType::from_dtype(&dtype)
-    );
-    log::info!("    - Shape: {shape:?}");
+    
+    print_colored_quoted(out, Color::Yellow, "     - Data type: ", format!("{}",NativePrimitiveType::from_dtype(&dtype)))?;
+    print_colored_quoted(out, Color::Yellow, "     - Shape: ", format!("{shape:?}"))?;
+    log::trace!(" {dtype:?}, {}B", dtype.size());
 
     match NativePrimitiveType::from_dtype(&dtype) {
         NativePrimitiveType::Integer32b => {
-            let data = dataset.read_2d::<i32>().unwrap();
-            log::info!("    - First 10 elements: {:?}", &data);
+            let data = dataset.read_dyn()?;
+            print_preview_n_samples::<i32>(&data, n_samples, out)?;
         }
         NativePrimitiveType::Integer64b => {
-            let data = dataset.read_2d::<i64>().unwrap();
-            log::info!("    - First 10 elements: {:?}", &data);
+            let data = dataset.read_dyn()?;
+            print_preview_n_samples::<i64>(&data, n_samples, out)?;
         }
         NativePrimitiveType::UnsignedInteger32b => {
-            todo!()
+            let data = dataset.read_dyn()?;
+            print_preview_n_samples::<u32>(&data, n_samples, out)?;
         }
         NativePrimitiveType::UnsignedInteger64b => {
-            let data = dataset.read_2d::<u64>().unwrap();
-            log::info!("    - First 10 elements: {:?}", &data);
+            let data = dataset.read_dyn()?;
+            print_preview_n_samples::<u64>(&data, n_samples, out)?;
         }
         NativePrimitiveType::Float32b => {
-            let data = dataset.read_2d::<f32>().unwrap();
-
-            for idx in 0..shape.len() {
-                let axis_len = data.lanes(Axis(idx)).into_iter().count();
-                let axis = data.lanes(Axis(idx));
-                log::info!("Axis[{idx}] len = {axis_len}");
-                let mut i = 0;
-                for element in axis {
-                    if i == 0 {
-                        log::trace!("dim: {}, ndim: {}", element.dim(), element.ndim());
-                    }
-                    log::info!("\t\t[{i}]: {element}");
-                    log::debug!("\t\t[{i}]: {}", element.get(0).unwrap());
-                    i += 1;
-                    if i == 10 {
-                        break;
-                    }
-                }
-            }
+            let data = dataset.read_dyn()?;
+            print_preview_n_samples::<f32>(&data, n_samples, out)?;
         }
         NativePrimitiveType::Float64b => {
-            let data = dataset.read_2d::<f64>().unwrap();
-            let d = data.lanes(Axis(0));
-            let axis0 = d.into_producer();
-            let mut idx = 0;
-            for e in axis0.into_producer() {
-                log::info!("    - First 10 elements: {e}");
-                idx += 1;
-                if idx == 10 {
-                    break;
-                }
-            }
+            let data = dataset.read_dyn()?;
+            print_preview_n_samples::<f64>(&data, n_samples, out)?;
         }
-        NativePrimitiveType::Pointer(_) => todo!(),
+        NativePrimitiveType::Pointer(_) => {
+            let data = dataset.read_dyn()?;
+            print_preview_n_samples::<usize>(&data, n_samples, out)?;
+        }
     }
 
     Ok(())
 }
 
-pub fn print_group_info(group: &hdf5::Group) -> anyhow::Result<()> {
+pub fn print_group_info(group: &hdf5::Group, n_samples: usize, out: &mut StandardStream) -> anyhow::Result<()> {
     let gname = group.name();
-    log::info!("Group: '{gname}'");
+    print_colored_quoted(out, Color::Cyan, "Group:", format!("{gname}"))?;
 
     if let Ok(attr) = group.attr_names() {
-        log::info!("Attributes: {attr:?}");
+        print_colored_quoted(out, Color::Blue, "Attributes:", format!("{attr:?}"))?;
     } else {
         log::warn!("No attributes found");
     }
 
     for member in group.member_names()? {
-        log::info!("Dataset '{member}'");
+
+        print_colored_quoted(out, Color::Magenta, "Dataset:", format!("{member}"))?;
         if let Ok(dataset) = group.dataset(&member) {
-            log::info!("{dataset:?}");
             if let Ok(dataset) = dataset.as_dataset() {
-                print_dataset_info(&dataset)?;
+                print_dataset_info(&dataset, n_samples, out)?;
             } else if let Ok(subgroup) = dataset.as_group() {
-                print_group_info(&subgroup)?;
+                print_group_info(&subgroup, n_samples, out)?;
             } else {
                 log::error!("Unhandled object type for: {member}");
             }

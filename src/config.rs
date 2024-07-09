@@ -63,19 +63,21 @@ impl Config {
             _ => LogLevelNum::Trace,
         };
 
-        let log_color_when: stderrlog::ColorChoice = match cfg.color {
-            clap::ColorChoice::Auto => stderrlog::ColorChoice::Auto,
-            clap::ColorChoice::Always => stderrlog::ColorChoice::Always,
-            clap::ColorChoice::Never => stderrlog::ColorChoice::Never,
-        };
-
         stderrlog::new()
             .verbosity(log_level)
             .quiet(cfg.quiet)
-            .color(log_color_when)
+            .color(cfg.color_when())
             .init()?;
 
         Ok(cfg)
+    }
+
+    pub fn color_when(&self) -> stderrlog::ColorChoice {
+        match self.color {
+            clap::ColorChoice::Auto => stderrlog::ColorChoice::Auto,
+            clap::ColorChoice::Always => stderrlog::ColorChoice::Always,
+            clap::ColorChoice::Never => stderrlog::ColorChoice::Never,
+        }
     }
 
     /// Generate completion scripts for the specified shell.
@@ -113,4 +115,8 @@ pub struct PlotArgs {
 pub struct InspectArgs {
     #[arg(required(true))]
     pub src_hdf5: PathBuf,
+
+    /// How many samples to print from each dimension and axis
+    #[arg(short, long, default_value("10"))]
+    pub preview_samples: usize,
 }

@@ -15,7 +15,6 @@ pub fn handle_plot_cmd(plot_args: &PlotArgs, cfg: &Config) -> anyhow::Result<()>
     log::debug!("opening: {:?}", plot_args.src_hdf5.as_path());
     let file = hdf5::File::open(plot_args.src_hdf5.as_path())?;
 
-    print_group_info(&file)?;
 
     if let Some(ref dname) = plot_args.dataset_name {
         let dataset = file.dataset(dname)?;
