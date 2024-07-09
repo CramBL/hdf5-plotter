@@ -2,9 +2,6 @@ use std::mem::size_of;
 
 use hdf5::Datatype;
 
-
-
-
 #[derive(Debug)]
 pub enum NativePrimitiveType {
     Integer32b,

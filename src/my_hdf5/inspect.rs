@@ -7,13 +7,35 @@ use termcolor::{Color, StandardStream};
 use crate::my_hdf5::util::NativePrimitiveType;
 use crate::util::{print_color, print_colored_quoted};
 
-
-pub fn print_dataset_info(dataset: &hdf5::Dataset, n_samples: usize, out: &mut StandardStream) -> anyhow::Result<()> {
-
-    print_colored_quoted(out, Color::Magenta, "  - Dataset: ", format!("{}", dataset.name()))?;
-    print_colored_quoted(out, Color::Yellow, "     - Layout: ", format!("{:?}", dataset.layout()))?;
-    print_colored_quoted(out, Color::Yellow, "     - Attribute names: ", format!("{:?}", dataset.attr_names().unwrap_or_default()))?;
-    print_colored_quoted(out, Color::Yellow, "     - Resizable: ", format!("{}", dataset.is_resizable()))?;
+pub fn print_dataset_info(
+    dataset: &hdf5::Dataset,
+    n_samples: usize,
+    out: &mut StandardStream,
+) -> anyhow::Result<()> {
+    print_colored_quoted(
+        out,
+        Color::Magenta,
+        "  - Dataset: ",
+        format!("{}", dataset.name()),
+    )?;
+    print_colored_quoted(
+        out,
+        Color::Yellow,
+        "     - Layout: ",
+        format!("{:?}", dataset.layout()),
+    )?;
+    print_colored_quoted(
+        out,
+        Color::Yellow,
+        "     - Attribute names: ",
+        format!("{:?}", dataset.attr_names().unwrap_or_default()),
+    )?;
+    print_colored_quoted(
+        out,
+        Color::Yellow,
+        "     - Resizable: ",
+        format!("{}", dataset.is_resizable()),
+    )?;
     if let Ok(dataset_access) = dataset.access_plist() {
         log::debug!("Dataset access: ");
         if let Ok(proplistclass) = dataset_access.class() {
@@ -24,8 +46,13 @@ pub fn print_dataset_info(dataset: &hdf5::Dataset, n_samples: usize, out: &mut S
     }
     let dtype = dataset.dtype()?;
     let shape = dataset.shape();
-    
-    print_colored_quoted(out, Color::Yellow, "     - Data type: ", format!("{}",NativePrimitiveType::from_dtype(&dtype)))?;
+
+    print_colored_quoted(
+        out,
+        Color::Yellow,
+        "     - Data type: ",
+        format!("{}", NativePrimitiveType::from_dtype(&dtype)),
+    )?;
     print_colored_quoted(out, Color::Yellow, "     - Shape: ", format!("{shape:?}"))?;
     log::trace!(" {dtype:?}, {}B", dtype.size());
 
@@ -63,7 +90,11 @@ pub fn print_dataset_info(dataset: &hdf5::Dataset, n_samples: usize, out: &mut S
     Ok(())
 }
 
-pub fn print_group_info(group: &hdf5::Group, n_samples: usize, out: &mut StandardStream) -> anyhow::Result<()> {
+pub fn print_group_info(
+    group: &hdf5::Group,
+    n_samples: usize,
+    out: &mut StandardStream,
+) -> anyhow::Result<()> {
     let gname = group.name();
     print_colored_quoted(out, Color::Cyan, "Group:", format!("{gname}"))?;
 
@@ -74,7 +105,6 @@ pub fn print_group_info(group: &hdf5::Group, n_samples: usize, out: &mut Standar
     }
 
     for member in group.member_names()? {
-
         print_colored_quoted(out, Color::Magenta, "Dataset:", format!("{member}"))?;
         if let Ok(dataset) = group.dataset(&member) {
             if let Ok(dataset) = dataset.as_dataset() {
@@ -95,9 +125,8 @@ pub fn print_group_info(group: &hdf5::Group, n_samples: usize, out: &mut Standar
 pub fn print_preview_n_samples<T: H5Type + fmt::Display + std::fmt::Debug>(
     data: &ArrayD<T>,
     n: usize,
-    out: &mut StandardStream
+    out: &mut StandardStream,
 ) -> anyhow::Result<()> {
-    
     take_n_from_dims_print(data, n, out)?;
     take_n_from_axes_print(data, n, out)?;
     Ok(())
@@ -106,14 +135,19 @@ pub fn print_preview_n_samples<T: H5Type + fmt::Display + std::fmt::Debug>(
 pub fn take_n_from_axes_print<T: H5Type + fmt::Display>(
     data: &ArrayD<T>,
     n: usize,
-    out: &mut StandardStream
+    out: &mut StandardStream,
 ) -> anyhow::Result<()> {
     // Get the shape of the dataset
     let shape = data.shape();
     log::debug!("{shape:?}");
     let dims = data.ndim();
 
-    print_colored_quoted(out, Color::Blue, "===> Displaying preview of axes of ", format!("{dims}-D array"))?;
+    print_colored_quoted(
+        out,
+        Color::Blue,
+        "===> Displaying preview of axes of ",
+        format!("{dims}-D array"),
+    )?;
     log::debug!("Raw array preview: {data}");
 
     // Iterate over each dimension and print the first 10 elements along that axis
@@ -126,16 +160,19 @@ pub fn take_n_from_axes_print<T: H5Type + fmt::Display>(
         let mut i = 0;
         for element in axis.into_iter().take(n) {
             if i == 0 {
-                print_color(out, Color::Yellow,format!("{info} dim: {}, ndim: {}", element.dim(), element.ndim()))?;
+                print_color(
+                    out,
+                    Color::Yellow,
+                    format!("{info} dim: {}, ndim: {}", element.dim(), element.ndim()),
+                )?;
             }
-            print_color(out, Color::White,format!("\t\t[{i}]: {element}"))?;
+            print_color(out, Color::White, format!("\t\t[{i}]: {element}"))?;
             if let Some(first_element) = element.get(0) {
                 log::trace!("\t\t[{i}][0]: {first_element}");
             }
             i += 1;
         }
     }
-
 
     print_color(out, Color::Blue, "<===")?;
     Ok(())
@@ -144,18 +181,27 @@ pub fn take_n_from_axes_print<T: H5Type + fmt::Display>(
 pub fn take_n_from_dims_print<T: H5Type + std::fmt::Debug>(
     data: &ArrayD<T>,
     n: usize,
-    out: &mut StandardStream
+    out: &mut StandardStream,
 ) -> anyhow::Result<()> {
     // Get the shape of the dataset
     let shape = data.shape();
     let dims = data.ndim();
     log::trace!("dims={dims}");
-    print_colored_quoted(out, Color::Blue, "===> Displaying preview of dimension of ", format!("{dims}-D dataset"))?;
+    print_colored_quoted(
+        out,
+        Color::Blue,
+        "===> Displaying preview of dimension of ",
+        format!("{dims}-D dataset"),
+    )?;
 
-    
     // Iterate over each dimension and print the first 10 elements
     for dim_index in 0..dims {
-        print_colored_quoted(out, Color::Blue, format!("First {n} elements of dimension "), format!("{dim_index}"))?;
+        print_colored_quoted(
+            out,
+            Color::Blue,
+            format!("First {n} elements of dimension "),
+            format!("{dim_index}"),
+        )?;
         let mut elements = vec![];
         for i in 0..shape[dim_index].min(n) {
             // Start index at the origin for all dimensions
@@ -168,7 +214,7 @@ pub fn take_n_from_dims_print<T: H5Type + std::fmt::Debug>(
         }
         println!("{elements:?}");
     }
-    
+
     print_color(out, Color::Blue, "<===")?;
     Ok(())
 }

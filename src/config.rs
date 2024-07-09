@@ -1,7 +1,5 @@
 use {
-    clap::{
-        command, ArgAction, Args, Parser, Subcommand,
-    },
+    clap::{command, ArgAction, Args, Parser, Subcommand},
     std::path::PathBuf,
     stderrlog::LogLevelNum,
 };
@@ -113,7 +111,6 @@ pub struct PlotArgs {
     /// Include every N'th sample in the plot
     #[arg(short, long, default_value("1"), value_name("N"))]
     pub subsample: usize,
-
 }
 
 #[derive(Debug, Args, Clone)]
