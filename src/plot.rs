@@ -21,37 +21,27 @@ pub fn handle_plot_cmd(plot_args: &PlotArgs, cfg: &Config) -> anyhow::Result<()>
         let dataset = file.dataset(dname)?;
         log::info!("{dataset:?}");
         // // Read the dataset as Vec<i32> or Vec<f64> depending on the content type
-        let data = dataset.read_2d::<f32>().unwrap();
-        let dxxx = data.fold_axis(ndarray::Axis(1), 0_f32, |_c, d| *d);
-        println!("---------");
-        println!("{dxxx}");
-        println!("{}", dxxx.sum());
-        // println!("{data:?}");
+        let data_2dim = dataset.read_2d::<f32>().unwrap();
+        let data_2dim_folded = data_2dim.fold_axis(ndarray::Axis(1), 0_f32, |_c, d| *d);
 
-        // let sum = data.sum();
+        let sum = data_2dim_folded.sum();
         let (mut min, mut max) = (f32::MAX, f32::MIN);
-        for d in &dxxx {
+        for d in &data_2dim_folded {
             if *d < min {
                 min = *d;
             } else if *d > max {
                 max = *d;
             }
         }
-
-        // let avg = sum / (data.len() as f32);
-
-        // println!("Sum={sum}, Avg={avg}, Min={min}, Max={max}");
-
-        // Flatten the 2D data for plotting
+        let avg = sum / (data_2dim_folded.len() as f32);
+        println!("Sum={sum}, Avg={avg}, Min={min}, Max={max}");
 
         // Plot the data
         #[cfg(features = "rplotters")]
         rplotters::plot_data(dxxx.as_slice().unwrap(), dxxx.len(), 1, min, max)?;
 
-        let data = dxxx.as_slice().unwrap();
-
         #[cfg(feature = "rplotly")]
-        plotly::plotly(data);
+        plotly::plotly(data_2dim_folded.as_slice().unwrap());
     }
 
     Ok(())

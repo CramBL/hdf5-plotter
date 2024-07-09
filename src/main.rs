@@ -1,4 +1,8 @@
-use hdf5_test::{config::Config, plot::handle_plot_cmd};
+use hdf5_test::{
+    config::{Command, Config},
+    inspect::handle_inspect,
+    plot::handle_plot_cmd,
+};
 
 fn main() -> anyhow::Result<()> {
     let cfg = Config::init()?;
@@ -6,8 +10,9 @@ fn main() -> anyhow::Result<()> {
 
     match cfg.command {
         Some(ref c) => match c {
-            hdf5_test::config::Command::Plot(ref args) => handle_plot_cmd(args, &cfg)?,
-            hdf5_test::config::Command::TestSwMr => hdf5_test::swmr::multiple_reader()?,
+            Command::Plot(ref args) => handle_plot_cmd(args, &cfg)?,
+            Command::TestSwMr => hdf5_test::swmr::multiple_reader()?,
+            Command::Inspect(ref args) => handle_inspect(args, &cfg)?,
         },
         None => log::trace!("No subcommand"),
     }

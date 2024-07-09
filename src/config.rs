@@ -93,6 +93,7 @@ impl Config {
 #[derive(Debug, Subcommand)]
 pub enum Command {
     Plot(PlotArgs),
+    Inspect(InspectArgs),
     TestSwMr,
 }
 
@@ -105,4 +106,11 @@ pub struct PlotArgs {
 
     #[arg(short, long)]
     pub dataset_name: Option<String>,
+}
+
+#[derive(Debug, Args, Clone)]
+#[command(flatten_help = true)]
+pub struct InspectArgs {
+    #[arg(required(true))]
+    pub src_hdf5: PathBuf,
 }
